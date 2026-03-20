@@ -11,59 +11,53 @@ import com.example.main.repository.InventoryRepository;
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
-	@Autowired
-	private InventoryRepository inrepo;
-	
-	
-	@Override
-	public InventoryItem addItem(InventoryItem it) {
-		// TODO Auto-generated method stub
-		return inrepo.save(it);
-		
-	}
+    @Autowired
+    private InventoryRepository repository;
 
-	@Override
-	public List<InventoryItem> getAllItems() {
-		// TODO Auto-generated method stub
-		return inrepo.findAll();
-	}
+    @Override
+    public InventoryItem addItem(InventoryItem item) {
+        return repository.save(item);
+    }
 
-	@Override
-	public InventoryItem getItemById(Long id) {
-		// TODO Auto-generated method stub
-		
-		return inrepo.findById(id).orElse(null);
-		
-	}
+    @Override
+    public List<InventoryItem> getAllItems() {
+        return repository.findAll();
+    }
 
-	@Override
-	public InventoryItem updateItem(Long id, InventoryItem it) {
+    @Override
+    public InventoryItem getItemById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-		InventoryItem i = inrepo.findById(id).orElse(null);
-		
-		if(i==null)
-		{
-			return null;
-		}
-		
-		i.setName(it.getName());
-		i.setCategory(it.getCategory());
-		i.setQuantity(it.getQuantity());
-		i.setPrice(it.getPrice());
-		i.setSupplier(it.getSupplier());
-		i.setDescription(it.getDescription());
-		
-		return inrepo.save(i);
-		
-	}
+    @Override
+    public InventoryItem updateItem(Long id, InventoryItem item) {
 
-	
-	@Override
-	public void deleteItem(Long id) {
-		
-		inrepo.deleteById(id);
-		
-	}
+        InventoryItem existing = repository.findById(id).orElse(null);
 
-	
+        if(existing == null) {
+            return null;
+        }
+
+        existing.setName(item.getName());
+        existing.setCategory(item.getCategory());
+        existing.setQuantity(item.getQuantity());
+        existing.setPrice(item.getPrice());
+        existing.setSupplier(item.getSupplier());
+        existing.setDescription(item.getDescription());
+
+        return repository.save(existing);
+    }
+
+    @Override
+    public void deleteItem(Long id) {
+        repository.deleteById(id);
+    }
+
+    @Override
+    public List<InventoryItem> searchItems(String keyword) {
+
+        return repository.findAll().stream()
+                .filter(item -> item.getName().toLowerCase().contains(keyword.toLowerCase()))
+                .toList();
+    }
 }
